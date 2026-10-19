@@ -23,4 +23,4 @@ jobs:
       run: bandit -r . -x ./venv
       
     - name: SCA (Safety - Dependency Check)
-      run: safety check
+      run: safety scan
