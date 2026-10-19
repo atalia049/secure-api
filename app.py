@@ -3,13 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 import jwt
 import bcrypt
 import datetime
+import os
 from functools import wraps
 from markupsafe import escape
 
 app = Flask(__name__)
 # 配置 SQLite 数据库 (自动在当前目录生成 app.db)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-app.config['SECRET_KEY'] = 'your-super-secret-key' # JWT 签名密钥
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-default-key-please-change')
 db = SQLAlchemy(app)
 
 # --- 数据库模型定义 ---
@@ -107,4 +108,5 @@ def register():
     return jsonify({'message': 'User registered successfully'}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, port=5000)
