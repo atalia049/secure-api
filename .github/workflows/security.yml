@@ -23,4 +23,6 @@ jobs:
       run: bandit -r . -x ./venv
       
     - name: SCA (Safety - Dependency Check)
-      run: safety scan --no-prompt
+    env:
+      SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+    run: safety scan
