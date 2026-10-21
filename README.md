@@ -112,4 +112,3 @@ The command returned "No such file or directory", proving the RCE was successful
 <img width="415" height="54" alt="image" src="https://github.com/user-attachments/assets/ef2c24b2-207f-46cc-8889-20849a22ed9d" />
 
 
-(Note: Regression testing was performed by ensuring the ActiveMQ Web Console and normal queue processing still functioned correctly after the upgrade.)
