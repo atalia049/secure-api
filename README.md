@@ -9,9 +9,11 @@
 This project is a secure REST API built using Python (Flask). It utilizes SQLite for data storage via SQLAlchemy ORM. The API implements secure authentication using JWT and includes the following endpoints:
 
 *   `POST /auth/login`: Accepts a JSON body with `username` and `password`. Upon successful authentication, it returns a JWT token.
-
+<img width="415" height="221" alt="image" src="https://github.com/user-attachments/assets/fec53e90-a40a-4377-9e3c-025d4c094ba4" />
 *   `GET /api/data`: A protected endpoint that returns a list of mock data. Requires a valid JWT in the `Authorization: Bearer <token>` header.
+<img width="415" height="222" alt="image" src="https://github.com/user-attachments/assets/14372777-2232-421e-875a-9f827aca9769" />
 *   `POST /api/register`: A supplementary endpoint to register a new user. Passwords are securely hashed before storage.
+<img width="415" height="223" alt="image" src="https://github.com/user-attachments/assets/5700a738-d3e0-481a-8e2f-752c54e3ea97" />
 
 ---
 
@@ -36,7 +38,8 @@ The CI/CD pipeline is configured using **GitHub Actions** (`.github/workflows/se
 *   **SCA (Software Composition Analysis):** We use **Safety** to check `requirements.txt` and installed dependencies against a database of known vulnerabilities.
 
 ### Screenshots of SAST/SCA Reports
-【在此处插入你的 GitHub Actions 绿色全通过的截图】
+<img width="414" height="201" alt="image" src="https://github.com/user-attachments/assets/a4b1aa44-8640-4b3e-8410-020cf9fad707" />
+
 *(Link to the successful pipeline run: 【在此处填入你 GitHub Actions 运行的网页链接】)*
 
 ---
