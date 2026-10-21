@@ -34,7 +34,8 @@ When returning user data, we ensure it is sanitized. While Flask returns JSON by
 ---
 
 ## 3. CI/CD Pipeline and Security Scanners (SAST/SCA)
-The CI/CD pipeline is configured using **GitHub Actions** `.github/workflows/security.yml`. It triggers automatically on every push or pull request to the `main` branch.
+The CI/CD pipeline is configured using **GitHub Actions** `.github/workflows/security.yml`.
+It triggers automatically on every push or pull request to the `master` branch.
 
 *   **SAST (Static Application Security Testing):** We use **Bandit** to scan the Python source code for common security issues (e.g., hardcoded secrets, use of unsafe functions).
 *   **SCA (Software Composition Analysis):** We use **Safety** to check `requirements.txt` and installed dependencies against a database of known vulnerabilities.
