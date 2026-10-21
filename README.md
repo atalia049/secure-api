@@ -43,7 +43,7 @@ It triggers automatically on every push or pull request to the `master` branch.
 ### Screenshots of SAST/SCA Reports
 <img width="414" height="201" alt="image" src="https://github.com/user-attachments/assets/a4b1aa44-8640-4b3e-8410-020cf9fad707" />
 
-https://github.com/atalia049/secure-api/actions/runs/39219332043
+[https://github.com/atalia049/secure-api/actions/runs/39219332043](https://github.com/atalia049/secure-api/actions/runs/39537446958)
 
 ---
 
