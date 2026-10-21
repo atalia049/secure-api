@@ -58,6 +58,7 @@ The vulnerable environment was launched using Vulhub `vulhub/activemq/CVE-2015-5
 
 **Step 1: Send the malicious payload**
 We used the `jmet` tool with the `ROME` gadget chain to send a payload that executes the `touch /tmp/success` command. Because the system uses a higher Java version, `--add-opens` parameters are required to allow reflection.
+
 `java --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED -jar jmet-0.1.0-all.jar -Q event -I ActiveMQ -s -Y "touch /tmp/success" -Yp ROME 127.0.0.1 16161`
 
 <img width="415" height="168" alt="image" src="https://github.com/user-attachments/assets/3563c44d-b7e1-4900-aedd-a993a3b74eca" />
@@ -65,6 +66,7 @@ We used the `jmet` tool with the `ROME` gadget chain to send a payload that exec
 
 Step 2: Trigger the vulnerability
 Navigated to the ActiveMQ Web Console (http://127.0.0.1:8161/admin/), clicked on the event queue, and clicked on the Message ID to trigger deserialization.
+
 <img width="415" height="201" alt="image" src="https://github.com/user-attachments/assets/49abd179-81a6-4c85-aab5-355658051814" />
 
 
@@ -73,7 +75,8 @@ Entered the running container and checked for the file created by the command.
 docker exec -it <container_id> /bin/bash
 ls -la /tmp/success
 
-【在此处插入 5.11.1 容器内显示 /tmp/success 文件存在的截图】
+<img width="415" height="82" alt="image" src="https://github.com/user-attachments/assets/4fb42dbb-8102-4628-8ee0-d69384185200" />
+
 
 4.3 Root Cause Analysis
 The root cause is that the ActiveMQ Broker blindly accepts and deserializes Java objects from incoming JMS messages (specifically ObjectMessage) without verifying if the classes being deserialized are safe. By crafting a message containing a malicious "gadget chain" (like the ROME library payload), the deserialization process triggers unexpected method executions, ultimately leading to RCE.
@@ -83,17 +86,20 @@ The most effective fix is to upgrade ActiveMQ to a patched version where class f
 We modified the docker-compose.yml file to use the secure version 5.16.5 instead of the vulnerable 5.11.1.
 
 Changes made in 'docker-compose.yml':
-services:
-  activemq:
-    # image: vulhub/activemq:5.11.1  <-- Vulnerable version
-    image: vulhub/activemq:5.16.5     # <-- Patched version
+
+<img width="482" height="203" alt="image" src="https://github.com/user-attachments/assets/2db20afe-3ae2-491a-94b6-dfa4d6db5805" />
+
+<img width="457" height="217" alt="image" src="https://github.com/user-attachments/assets/8a2adb42-d98e-4ee9-a3bd-613d2530e00d" />
+
 
 4.5 Proof of Vulnerability Elimination
 After upgrading to 5.16.5, we restarted the environment and repeated the exact same attack steps. The broker's security mechanism successfully intercepted and blocked the deserialization of the malicious class.
 
 Verification in the Web Console:
 The web console threw an exception stating Forbidden class, indicating the payload was blocked.
-【在此处插入 网页端显示 Forbidden class 的截图（就是你发我的那张）】
+
+<img width="415" height="200" alt="image" src="https://github.com/user-attachments/assets/1439ec4c-0ae2-488e-9d67-176ac2fd53ef" />
+
 
 Verification in the Container:
 Entered the new container and checked for the file.
@@ -101,6 +107,8 @@ Entered the new container and checked for the file.
 bash
 ls -la /tmp/success
 The command returned "No such file or directory", proving the RCE was successfully prevented.
-【在此处插入 5.16.5 容器内显示 No such file or directory 的截图】
+
+<img width="415" height="54" alt="image" src="https://github.com/user-attachments/assets/ef2c24b2-207f-46cc-8889-20849a22ed9d" />
+
 
 (Note: Regression testing was performed by ensuring the ActiveMQ Web Console and normal queue processing still functioned correctly after the upgrade.)
